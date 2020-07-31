@@ -1,0 +1,252 @@
+---
+title: "STAT30040 Homework 7"
+author: "Sarah Adilijiang"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+## Problem 1
+### (a)
+$$Var(\hat{\mu}_0) = Var(\hat{\beta}_0+\hat{\beta}_1 x_0) = Var(\hat{\beta}_0) + x_0^2 Var(\hat{\beta}_1) + 2x_0Cov(\hat{\beta}_0,\, \hat{\beta}_1) = \frac{\sigma^2}{\sum\limits_{i=1}^n (x_i-\bar{x})^2} \left(\frac{\sum\limits_{i=1}^nx_i^2}{n} + x_0^2 -2x_0\bar{x}\right)$$
+$$=\frac{\sigma^2}{\sum\limits_{i=1}^n (x_i-\bar{x})^2} \left(\frac{\sum\limits_{i=1}^n (x_i-\bar{x})^2+n\bar{x}^2}{n} + x_0^2 -2x_0\bar{x}\right) = \sigma^2 \left(\frac{1}{n} + \frac{\bar{x}^2 +x_0^2 -2x_0\bar{x}}{\sum\limits_{i=1}^n (x_i-\bar{x})^2}\right) = \sigma^2 \left(\frac{1}{n} + \frac{(x_0-\bar{x})^2}{\sum\limits_{i=1}^n (x_i-\bar{x})^2}\right)$$
+
+
+
+### (b)
+$$SD(\hat{\mu}_0) = \sqrt{Var(\hat{\mu}_0)} = \sigma\, \sqrt{\frac{1}{n} + \frac{(x_0-\bar{x})^2}{\sum\limits_{i=1}^n (x_i-\bar{x})^2}}$$
+
+```{r}
+sigma=1;   n=100
+x = runif(100,0,1)
+SXX = sum((x-mean(x))^2)
+u = seq(0,1,by=0.0001) - mean(x)
+sd = sigma * sqrt(1/n + u^2/SXX)
+plot(sd~u, xlab=expression(x[0] - bar(x)), ylab=expression(paste("SD of ",hat(u[0]))), cex=0.1)
+```
+
+
+
+### (c)
+Since $E(\hat{\mu}_0) = E(\hat{\beta}_0+\hat{\beta}_1 x_0) = \beta_0 + \beta_1 x_0 = \mu_0$ and $Var(\hat{\mu}_0) = \sigma^2 \left(\frac{1}{n} + \frac{(x_0-\bar{x})^2}{\sum\limits_{i=1}^n (x_i-\bar{x})^2}\right)$
+
+Thus under the assumption of normality, we have the following distributions: 
+
+(1)$\hat{\mu}_0 \sim N\left( \mu_0,\, \sigma^2 \left(\frac{1}{n} + \frac{(x_0-\bar{x})^2}{\sum\limits_{i=1}^n (x_i-\bar{x})^2}\right) \right)$, hence $\frac{\hat{\mu}_0 - \mu_0}{\sigma\, \sqrt{\frac{1}{n} + \frac{(x_0-\bar{x})^2}{\sum\limits_{i=1}^n (x_i-\bar{x})^2}}} \sim N(0,1)$
+
+(2)$\frac{RSS}{\sigma^2} \sim \chi^2_{n-2}$
+
+(3)These two distributions are independent
+
+So from these three points, we can obtain:
+$$\frac{\frac{\hat{\mu}_0 - \mu_0}{\sigma\, \sqrt{\frac{1}{n} + \frac{(x_0-\bar{x})^2}{\sum\limits_{i=1}^n (x_i-\bar{x})^2}}}}{\sqrt{\frac{RSS}{\sigma^2}/(n-2)}} \sim t_{(n-2)}$$
+
+Plug in $\hat{\sigma} = \frac{RSS}{n-2}$, we get:
+$$\frac{\hat{\mu}_0 - \mu_0}{\hat{\sigma}\, \sqrt{\frac{1}{n} + \frac{(x_0-\bar{x})^2}{\sum\limits_{i=1}^n (x_i-\bar{x})^2}}} \sim t_{(n-2)}$$
+
+Therefore, a $1 - \alpha = 95\%$ confidence interval for $\mu_0$ is:
+$$\hat{\mu}_0 \ \pm \ t_{\frac{\alpha}{2}, \ (n-2)} \ \hat{\sigma}\, \sqrt{\frac{1}{n} + \frac{(x_0-\bar{x})^2}{\sum\limits_{i=1}^n (x_i-\bar{x})^2}}$$
+where $\hat{\sigma} = \frac{RSS}{n-2}$
+
+
+
+
+## Problem 2
+### (a)
+Since the $e_0$ is independent of the original observations and has the variance $\sigma^2$, so we have:
+$$Var(\hat{Y}_0 - Y_0) = Var(\hat{\beta}_0+\hat{\beta}_1 x_0 - \beta_0 -\beta_1 x_0 - e_0) = Var(\hat{\beta}_0+\hat{\beta}_1 x_0) +  Var(e_0)$$
+$$= \sigma^2 \left(\frac{1}{n} + \frac{(x_0-\bar{x})^2}{\sum\limits_{i=1}^n (x_i-\bar{x})^2}\right) + \sigma^2 \ = \ \sigma^2 \left(1+\frac{1}{n} + \frac{(x_0-\bar{x})^2}{\sum\limits_{i=1}^n (x_i-\bar{x})^2}\right) $$
+
+Comparing with $\hat{\mu}_0$ in problem 1, we have: $Var(\hat{Y}_0 - Y_0) - Var(\hat{\mu}_0) = \sigma^2$
+
+
+
+### (b)
+Since $E(\hat{Y}_0-Y_0) = E(\hat{\beta}_0+\hat{\beta}_1 x_0 - \beta_0 -\beta_1 x_0 - e_0) = 0$ and $Var(\hat{Y}_0-Y_0) = \sigma^2 \left(1+\frac{1}{n} + \frac{(x_0-\bar{x})^2}{\sum\limits_{i=1}^n (x_i-\bar{x})^2}\right)$
+
+Thus under the assumption of normality and that $e_0$ is normally distributed, we have the distribution of $\hat{Y}_0-Y_0$: 
+$$\hat{Y}_0-Y_0 \sim N\left(0,\, \sigma^2 \left(1+\frac{1}{n} + \frac{(x_0-\bar{x})^2}{\sum\limits_{i=1}^n (x_i-\bar{x})^2}\right) \right)$$
+
+So $\frac{\hat{Y}_0 - Y_0}{\sigma\, \sqrt{1+\frac{1}{n} + \frac{(x_0-\bar{x})^2}{\sum\limits_{i=1}^n (x_i-\bar{x})^2}}} \sim N(0,1)$, since $\frac{RSS}{\sigma^2} \sim \chi^2_{n-2}$ and these two distributions are independent, we can obtain that:
+$$\frac{\frac{\hat{Y}_0 - Y_0}{\sigma\, \sqrt{1+\frac{1}{n} + \frac{(x_0-\bar{x})^2}{\sum\limits_{i=1}^n (x_i-\bar{x})^2}}}}{\sqrt{\frac{RSS}{\sigma^2}/(n-2)}} \sim t_{(n-2)}$$
+
+Plug in $\hat{\sigma} = \frac{RSS}{n-2}$, we get:
+$$\frac{\hat{Y}_0 - Y_0}{\hat{\sigma}\, \sqrt{1+\frac{1}{n} + \frac{(x_0-\bar{x})^2}{\sum\limits_{i=1}^n (x_i-\bar{x})^2}}} \sim t_{(n-2)}$$
+
+Therefore, a $100(1 - \alpha)\%$ prediction interval for $Y_0$ is:
+$$\hat{Y}_0 \ \pm \ t_{\frac{\alpha}{2}, \ (n-2)} \ \hat{\sigma}\, \sqrt{1+\frac{1}{n} + \frac{(x_0-\bar{x})^2}{\sum\limits_{i=1}^n (x_i-\bar{x})^2}}$$
+where $\hat{\sigma} = \frac{RSS}{n-2}$ and $\hat{Y}_0 = \hat{\beta}_0+\hat{\beta}_1 x_0$
+
+
+
+
+## Problem 3
+```{r, echo=FALSE}
+asthma = read.table("./data/asthma.txt", header=TRUE)
+cystfibr = read.table("./data/cystfibr.txt", header=TRUE)
+asthma$z = rep(0, times=nrow(asthma))
+cystfibr$z = rep(1, times=nrow(cystfibr))
+mydata = rbind(asthma, cystfibr)
+mydata$z = as.factor(mydata$z)
+```
+
+### (a)
+
+$\alpha_0$ is the intercept term, which represents the average respiratory resistance of a child with asthma and zero height value. If setting $\alpha_0$ to zero, we assume that the average respiratory resistance of a child with asthma and zero height value is zero.
+
+$\alpha_1$ is the coefficient of continuous predictor $x_i$ (**height**), which represents the change in the average respiratory resistance of a child with asthma for an additional unit (cm) of height. If setting $\alpha_1$ to zero, we assume that the average respiratory resistance of a child with asthma does not depend on the height of that child.
+
+$\beta_0$ is the coefficient of indicator predictor $z_i$, which represents the amount that the average respiratory resistance of a child with cystic fibrosis is higher than that of a child with asthma when they both have zero height value. If setting $\beta_0$ to zero, we assume that the average respiratory resistance of a child with cystic fibrosis is the same as a child with asthma when they both have zero height value. 
+
+$\beta_1$ is the coefficient of the interaction term between $x_i$ and $z_i$, which represents the amount that the change in the average respiratory resistance of a child with cystic fibrosis is higher than that of a child with asthma for an additional unit (cm) of height. If setting $\beta_1$ to zero, we assume that the change in the average respiratory resistance of a child with cystic fibrosis is the same as a child with asthma for an additional unit (cm) of height.
+
+
+### (b)
+```{r}
+mod = lm(resistance ~ height * z, mydata)
+summary(mod)
+```
+
+Answer:
+
+In the model summary, it shows the results of the four t-tests for all the parameters, where the null hypothesis is that their parameter values are zero, respectively. 
+
+We can see that $\alpha_0$ (intercept term) is significant at 0.1% significance level, which means the average respiratory resistance of a child with asthma and zero height value is not zero.
+
+$\alpha_1$ is significant at 1% significance level, which means the average respiratory resistance of a child with asthma does depend on the height of the child.
+
+$\beta_0$ is not significant, which means there is no significant evidence that the average respiratory resistance of a child with cystic fibrosis is different from a child with asthma when they both have zero height value. 
+
+$\beta_1$ is also not significant, which means there is no significant evidence that the change in the average respiratory resistance of a child with cystic fibrosis is different from a child with asthma for an additional unit (cm) of height.
+
+To sum up, the t-test results show that the average respiratory resistance of a child does depend on the height of the child, but there is no difference between two diseases when controlling for the height.
+
+
+
+### (c)
+```{r}
+nmod = lm(resistance ~ height, mydata)
+anova(nmod, mod)
+```
+
+Answer:
+
+$H_0: \beta_0 =\beta_1=0$, this null hypothesis means that the average respiratory resistance of a child is the same for a child with asthma and cycstic fibrosis when controlling for the height of the child.
+
+The p-value of F-test is 0.2371 > 0.05, so we do not reject the null hypothesis. Therefore, there is no significant evidence that the average respiratory resistance of a child is different from a child with asthma and cycstic fibrosis when controlling for the height of the child.
+
+
+
+### (d)
+```{r}
+plot(residuals(mod)~fitted(mod), xlab="Fitted values", ylab="Residuals")
+abline(h=0)
+```
+
+Answer:
+
+The variance of residuals seem to slightly increase when the fitted value increases, which shows a heteroskedasticity problem. Therefore, the model assumption of constant variance does not hold.
+
+
+
+
+## Problem 4
+### (a)
+In the new model: $z_i = u_i\beta_0+v_i\beta_1+\delta_i$, where $z_i=\rho_i^{-1}y_i$, $u_i=\rho_i^{-1}$, $v_i=\rho_i^{-1}x_i$, $\delta_i=\rho_i^{-1}e_i$, since $\rho_i$ are know constants, thus $z_i$ is still a random variable conditioning on given data $v_i$, and the random error term now is $\delta_i$. 
+
+And for the random error term, since $E(e_i)=0$ and $Var(e_i)=\rho_i^2\sigma^2$, and $e_i$ are independet, thus $E(\delta_i)=E(\rho_i^{-1}e_i)=0$ and $Var(\delta_i) = Var(\rho_i^{-1}e_i) = \sigma^2$, and $\delta_i$ are independent. Therefore, $\delta_i$ have mean zero and constant variance and are independent. 
+
+As a result, the new model $z_i = u_i\beta_0+v_i\beta_1+\delta_i$ satisfies the assumptions of the standard statistical model.
+
+
+
+### (b)
+In the least squares estimation, we want to minimize: $S(\beta_0,\beta_1) = \sum\limits_{i=1}^n \delta_i^2 = \sum\limits_{i=1}^n (z_i -  u_i\beta_0 - v_i\beta_1)^2$
+
+So we set the following derivatives to zero: 
+$$\frac{\partial S}{\partial \beta_0} = -2 \sum\limits_{i=1}^n u_i (z_i -  u_i\beta_0 - v_i\beta_1) = 0$$
+$$\frac{\partial S}{\partial \beta_1} = -2 \sum\limits_{i=1}^n v_i (z_i -  u_i\beta_0 - v_i\beta_1) = 0$$
+
+Thus we get that the minimizers $\hat{\beta}_0$ and $\hat{\beta}_1$ satisfy:
+$$\sum\limits_{i=1}^n u_iz_i = \hat{\beta}_0 \sum\limits_{i=1}^n u_i^2 + \hat{\beta}_1 \sum\limits_{i=1}^n u_iv_i$$
+$$\sum\limits_{i=1}^n v_iz_i = \hat{\beta}_0 \sum\limits_{i=1}^n u_iv_i + \hat{\beta}_1 \sum\limits_{i=1}^n v_i^2$$
+
+Solving for $\hat{\beta}_0$ and $\hat{\beta}_1$, we obtain:
+$$\hat{\beta}_0 = \frac{\sum\limits_{i=1}^n v_i^2 \sum\limits_{i=1}^n u_iz_i - \sum\limits_{i=1}^n u_iv_i \sum\limits_{i=1}^n v_iz_i} {\sum\limits_{i=1}^n u_i^2 \sum\limits_{i=1}^n v_i^2 - (\sum\limits_{i=1}^n u_iv_i)^2}  \ \ = \ \ \frac{\sum\limits_{i=1}^n \rho_i^{-2} x_i^2 \sum\limits_{i=1}^n \rho_i^{-2} y_i - \sum\limits_{i=1}^n \rho_i^{-2} x_i \sum\limits_{i=1}^n \rho_i^{-2} x_iy_i} {\sum\limits_{i=1}^n \rho_i^{-2} \sum\limits_{i=1}^n \rho_i^{-2} x_i^2 - (\sum\limits_{i=1}^n \rho_i^{-2} x_i)^2}$$
+$$\hat{\beta}_1 = \frac{\sum\limits_{i=1}^n u_i^2 \sum\limits_{i=1}^n v_iz_i - \sum\limits_{i=1}^n u_iv_i \sum\limits_{i=1}^n u_iz_i} {\sum\limits_{i=1}^n u_i^2 \sum\limits_{i=1}^n v_i^2 - (\sum\limits_{i=1}^n u_iv_i)^2} \ \ = \ \ \frac{\sum\limits_{i=1}^n \rho_i^{-2} \sum\limits_{i=1}^n \rho_i^{-2} x_iy_i - \sum\limits_{i=1}^n \rho_i^{-2} x_i \sum\limits_{i=1}^n \rho_i^{-2} y_i} {\sum\limits_{i=1}^n \rho_i^{-2} \sum\limits_{i=1}^n \rho_i^{-2} x_i^2 - (\sum\limits_{i=1}^n \rho_i^{-2} x_i)^2}$$
+
+Since $\frac{\partial^2 S}{\partial \beta_0^2} = 2 \sum\limits_{i=1}^n u_i^2 > 0$ and $\frac{\partial^2 S}{\partial \beta_1^2} = 2 \sum\limits_{i=1}^n v_i^2 > 0$, so the $\hat{\beta}_0$ and $\hat{\beta}_1$ are the minimizer for function $S(\beta_0,\beta_1)$.
+
+
+
+### (c)
+In question (b), 
+$$S(\beta_0,\beta_1) = \sum\limits_{i=1}^n (z_i -  u_i\beta_0 - v_i\beta_1)^2 = \sum\limits_{i=1}^n (\rho_i^{-1}y_i -  \rho_i^{-1}\beta_0 - \rho_i^{-1}x_i\beta_1)^2 = \sum\limits_{i=1}^n (y_i -  \beta_0 - \beta_1x_i)^2 \rho_i^{-2}$$
+
+Therefore, minimizing $S(\beta_0,\beta_1)$ in the question (b) is equivalent to minimizing $\sum\limits_{i=1}^n (y_i -  \beta_0 - \beta_1x_i)^2 \rho_i^{-2}$, which is the weighted least squares criterion.
+
+
+
+### (d)
+Since $Var(z_i) = Var(u_i\beta_0+v_i\beta_1+\delta_i) = Var(\delta_i) = \sigma^2$, so we have:
+
+$$Var(\hat{\beta}_0) = \frac{(\sum\limits_{i=1}^n v_i^2)^2 \sum\limits_{i=1}^n u_i^2 Var(z_i) + (\sum\limits_{i=1}^n u_iv_i)^2 \sum\limits_{i=1}^n v_i^2 Var(z_i) -2 (\sum\limits_{i=1}^n v_i^2) ( \sum\limits_{i=1}^n u_iv_i) Cov(\sum\limits_{i=1}^n u_iz_i, \sum\limits_{i=1}^n v_iz_i) } {\left( \sum\limits_{i=1}^n u_i^2 \sum\limits_{i=1}^n v_i^2 - (\sum\limits_{i=1}^n u_iv_i)^2 \right)^2}$$
+$$= \frac{\sigma^2 (\sum\limits_{i=1}^n v_i^2)^2 \sum\limits_{i=1}^n u_i^2 + \sigma^2 (\sum\limits_{i=1}^n u_iv_i)^2 \sum\limits_{i=1}^n v_i^2 -2 (\sum\limits_{i=1}^n v_i^2) ( \sum\limits_{i=1}^n u_iv_i) \sum\limits_{i=1}^n u_iv_i Var(z_i)} {\left( \sum\limits_{i=1}^n u_i^2 \sum\limits_{i=1}^n v_i^2 - (\sum\limits_{i=1}^n u_iv_i)^2 \right)^2}$$
+$$= \frac{\sigma^2 \sum\limits_{i=1}^n v_i^2} {\sum\limits_{i=1}^n u_i^2 \sum\limits_{i=1}^n v_i^2 - (\sum\limits_{i=1}^n u_iv_i)^2} \ \ = \ \ \frac{\sigma^2 \sum\limits_{i=1}^n \rho_i^{-2} x_i^2} {\sum\limits_{i=1}^n \rho_i^{-2} \sum\limits_{i=1}^n \rho_i^{-2} x_i^2 - (\sum\limits_{i=1}^n \rho_i^{-2} x_i)^2} $$
+
+and:
+$$Var(\hat{\beta}_1) = \frac{(\sum\limits_{i=1}^n u_i^2)^2 \sum\limits_{i=1}^n v_i^2 Var(z_i) + (\sum\limits_{i=1}^n u_iv_i)^2 \sum\limits_{i=1}^n u_i^2 Var(z_i) - 2(\sum\limits_{i=1}^n u_i^2)(\sum\limits_{i=1}^n u_iv_i) Cov(\sum\limits_{i=1}^n v_iz_i, \sum\limits_{i=1}^n u_iz_i)} {\left( \sum\limits_{i=1}^n u_i^2 \sum\limits_{i=1}^n v_i^2 - (\sum\limits_{i=1}^n u_iv_i)^2 \right)^2}$$
+$$= \frac{\sigma^2 (\sum\limits_{i=1}^n u_i^2)^2 \sum\limits_{i=1}^n v_i^2 + \sigma^2 (\sum\limits_{i=1}^n u_iv_i)^2 \sum\limits_{i=1}^n u_i^2 - 2(\sum\limits_{i=1}^n u_i^2)(\sum\limits_{i=1}^n u_iv_i) \sum\limits_{i=1}^n u_iv_i Var(z_i)} {\left( \sum\limits_{i=1}^n u_i^2 \sum\limits_{i=1}^n v_i^2 - (\sum\limits_{i=1}^n u_iv_i)^2 \right)^2}$$
+$$= \frac{\sigma^2 \sum\limits_{i=1}^n u_i^2} {\sum\limits_{i=1}^n u_i^2 \sum\limits_{i=1}^n v_i^2 - (\sum\limits_{i=1}^n u_iv_i)^2} \ \ = \ \ \frac{\sigma^2 \sum\limits_{i=1}^n \rho_i^{-2}} {\sum\limits_{i=1}^n \rho_i^{-2} \sum\limits_{i=1}^n \rho_i^{-2} x_i^2 - (\sum\limits_{i=1}^n \rho_i^{-2} x_i)^2} $$
+
+
+
+
+## Problem 5
+### (a)
+The original model is: $Y = X\beta + \varepsilon$, where $Y\in R^n, X\in R^{n\times p}, \beta\in R^p, \varepsilon \in R^n$, and $\varepsilon_i$'s are independent with mean 0 and $Var(\varepsilon) = \Sigma = \sigma^2 \left[ \begin{matrix} \rho_1^2 &  & \\ & \ddots & \\ &  & \rho_n^2 \end{matrix} \right] = \sigma^2 R^TR$, where $R=\left[ \begin{matrix} \rho_1 &  & \\ & \ddots & \\ &  & \rho_n \end{matrix} \right]$
+
+Now we transform the model into a one: $Z = V\beta + E$, where $Z=R^{-1}Y, \ V=R^{-1}X, \ E=R^{-1}\varepsilon$. 
+
+Since $R$ is a constant matrix, thus $Z$ is still a random variable matrix conditioning on given data design matrix $V$, and the random error matix now is $E$. 
+
+For the random error matix $E$, since $E(\varepsilon)=0$ and $Var(\varepsilon) = \Sigma = \sigma^2 R^TR$, and $\varepsilon_i$'s are independet, thus $E(E)=E(R^{-1}\varepsilon)=0$ and $Var(E) = Var(R^{-1}\varepsilon) = R^{-1} \sigma^2R^TR \ (R^{-1})^T = \sigma^2 I_n$, and $e_i$'s (the components of $E$) are independent. Therefore, $e_i$'s have mean zero and constant variance and are independent. 
+
+As a result, the new model $Z = V\beta + E$ satisfies the assumptions of the standard statistical model.
+
+
+
+### (b)
+In the least squares estimation, we want to minimize: $S(\beta) = ||Z-V\beta||^2$
+
+So we set the following derivative to zero: 
+$$\frac{\partial S}{\partial \beta} = \frac{\partial ||Z-V\beta||^2}{\partial \beta} = 0$$
+
+Since:
+$$||Z-V\beta||^2 = (Z-V\beta)^T(Z-V\beta) = (Z^T-\beta^TV^T)(Z-V\beta) = Z^TZ - \beta^TV^TZ - Z^TV\beta + \beta^TV^TV\beta = Z^TZ - 2\beta^TV^TZ + \beta^TV^TV\beta$$
+
+So:
+$$\frac{\partial S}{\partial \beta} = \frac{\partial ||Z-V\beta||^2}{\partial \beta} = - 2V^TZ + 2V^TV\beta = 0$$
+
+Solving the equation, we obtain: 
+$$\hat{\beta} = (V^TV)^{-1}V^TZ$$
+
+And since $\frac{\partial^2 S}{\partial \beta^2} = V^TV > 0$, so the $\hat{\beta} = (V^TV)^{-1}V^TZ$ is the minimizer for the score function $S(\beta)$.
+
+Then plug in $V=R^{-1}X, \ Z=R^{-1}Y$, we get that: 
+$$\hat{\beta} = ((R^{-1}X)^T R^{-1}X)^{-1} (R^{-1}X)^T R^{-1}Y = (X^T (R^TR)^{-1} X)^{-1} X^T (R^TR)^{-1} Y$$
+
+
+
+### (d)
+Since $Var(Z) = Var(V\beta+E) = Var(E) = \sigma^2 I_n$, so we have:
+$$Var(\hat{\beta}) = Var((V^TV)^{-1}V^TZ) = (V^TV)^{-1}V^T Var(Z) ((V^TV)^{-1}V^T)^T = \sigma^2 (V^TV)^{-1} (V^TV) (V^TV)^{-1} = \sigma^2 (V^TV)^{-1}$$
+
+Then plug in $V=R^{-1}X$, we get that: $Var(\hat{\beta}) = \sigma^2 ((R^{-1}X)^T R^{-1}X)^{-1} = \sigma^2 (X^T (R^TR)^{-1} X)^{-1}$
+
+
+
+
+
+
+

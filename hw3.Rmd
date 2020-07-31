@@ -1,0 +1,75 @@
+---
+title: "STAT30040 Homework 3"
+author: "Sarah Adilijiang"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+### Problem 1
+#### (a)
+The general form of a rotated ellipse that is centered at the origin (rotate counterclockwise about the origin through an angle of \(\alpha\)) is: 
+$$\frac{(x\cos\alpha+y\sin\alpha)^2}{a^2} + \frac{(x\sin\alpha-y\cos\alpha)^2}{b^2} = m \ \ \ \ \ (1)$$
+where \(a,b,m\) are constants, and \(\sqrt{m}a\) is the length of original horizontal x-axis while \(\sqrt{m}b\) is the length of original vertical y-axis, so \(a>0, \ b>0, \ m>0\)
+
+Expanding the binomial squares and collecting like terms gives:
+$$\Rightarrow \ \ (\frac{\cos^2\alpha}{a^2}+\frac{\sin^2\alpha}{b^2})x^2 + 2\cos\alpha\sin\alpha(\frac{1}{a^2}-\frac{1}{b^2})xy + (\frac{\sin^2\alpha}{a^2}+\frac{\cos^2\alpha}{b^2})y^2 = m \ \ \ \ \ (2)$$
+which is in the form \(Ax^2 + Bxy + Cy^2 = m\), where \(m>0, \ A>0, \ C>0, \ B\neq0\), and \(B^2-4AC<0\).
+
+Set the joint distribution of \((U,V)\) equals to constant \(c_1\), hence we have:
+$$f(u,v) = \frac{1}{2\pi\sqrt{1-\rho^2}} exp\{-\frac{1}{2(1-\rho^2)}(u^2-2\rho uv+v^2)\} = constant \ c_1$$
+where \(\rho \in (-1,1)\) and \(\rho \neq0\) (otherwise they will be independent and have circular contours)
+$$\Rightarrow \ \  u^2-2\rho uv+v^2 = -2(1-\rho^2)log(2\pi c_1\sqrt{1-\rho^2}) = constant \ c_2 \ \ \ \ \ (3)$$
+Comparing equation (3) with the ellipse formula form \(Ax^2 + Bxy + Cy^2 = m\), here we have \(A=C=1>0, \ B=-2\rho\neq0, \ B^2-4AC=4(\rho^2-1)<0\), and \(c_2 = u^2-2\rho uv+v^2 = (u-\rho v)^2 + (1-\rho^2)v^2 >0\). Therefore, the contours of the density \(\{(u,v):f(u,v)=constant\}\) are ellipses.
+
+Further, comparing equation (3) with equation (2), we can set the following relationships (note that in equation (3) \(u\) and \(v\) are symmetric):
+$$m=c_2\times c_3, \ \ \ \frac{\cos^2\alpha}{a^2}+\frac{\sin^2\alpha}{b^2} = \frac{\sin^2\alpha}{a^2}+\frac{\cos^2\alpha}{b^2} = 1, \ \ \ 2\cos\alpha\sin\alpha(\frac{1}{a^2}-\frac{1}{b^2}) = -2\rho$$
+Thus we get:
+$$\alpha=\frac{\pi}{4}+k\pi \ \ or \ \ \frac{3\pi}{4}+k\pi, \ \ \ \frac{1}{a^2}+\frac{1}{b^2}=2, \ \ \ \frac{1}{a^2}-\frac{1}{b^2}=\frac{-\rho}{\sin\alpha\cos\alpha}$$
+When \(\alpha=\frac{\pi}{4}+k\pi\), we get \(\frac{1}{a^2}+\frac{1}{b^2}=2, \ \ \frac{1}{a^2}-\frac{1}{b^2}=-2\rho\), so \(a^2=\frac{1}{1-\rho}\) and \(b^2=\frac{1}{1+\rho}\), thus \(\sqrt{m}a\), the length of original horizontal axis, is also the length of major axis. Therefore, we are rotating the horizontal major axis counterclockwise about the origin through an angle of \(\alpha=\frac{\pi}{4}+k\pi\), so the direction of the major axis falls in the line \(u=v\) after the rotation.
+
+
+When \(\alpha=\frac{3\pi}{4}+k\pi\), we get \(\frac{1}{a^2}+\frac{1}{b^2}=2, \ \ \frac{1}{a^2}-\frac{1}{b^2}=2\rho\), so \(a^2=\frac{1}{1+\rho}\) and \(b^2=\frac{1}{1-\rho}\), thus \(\sqrt{m}b\), the length of original vertical axis, is now the length of major axis. Therefore, we are rotating the vertical major axis counterclockwise about the origin through an angle of \(\alpha=\frac{3\pi}{4}+k\pi\), so the direction of the major axis still falls in the line \(u=v\) after the rotation.
+
+So we have proved that the line \(u=v\) is the direction of the major axis of the elliptical contours.
+
+
+#### (b)
+
+In question (a), we have proved that whether \(\alpha=\frac{\pi}{4}+k\pi\) or \(\alpha=\frac{3\pi}{4}+k\pi\), the line \(u=v\) is the direction of the major axis of the elliptical contours, and the ratio of the lengths of major axis and minor axis of the elliptical contours is always \((\frac{\sqrt{m}}{\sqrt{1-\rho}}) / (\frac{\sqrt{m}}{\sqrt{1+\rho}}) = \sqrt{\frac{1+\rho}{1-\rho}}\)
+
+
+
+\newpage
+## Codes for other problems
+### Problem 3
+#### (d)
+```{r}
+x1 = 7810
+x2 = 6688
+n1 = 14736
+n2 = 12673
+
+t = (x1+x2)/(n1+n2)
+a = x1/n1
+b = x2/n2
+
+LR = (t/a)^x1 * (t/b)^x2 * ((1-t)/(1-a))^(n1-x1) * ((1-t)/(1-b))^(n2-x2); LR
+-2*log(0.9326)
+pchisq(0.1396,1,lower.tail=FALSE)
+```
+
+
+### Problem 5
+#### (c)
+```{r}
+pchisq(-2*log(0.9331),1,lower.tail=FALSE)
+```
+
+
+#### (d)
+```{r}
+2 * (1-pbinom(33,65,1/2))
+```
+
+

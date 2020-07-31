@@ -1,0 +1,103 @@
+---
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+### Problem 3
+#### (a)
+(i) 
+Since \(\alpha = 0.05\), so we are constructing 95% confidence intervals for p. Therefore, the theoretically expected proportion of k confidence intervals that contains the true parameter \(p = 0.1\) should be 95%.
+
+(ii)
+\(X \sim Binomial(n,p)\), and \(\hat{p}_{MLE} = X/n\)
+```{r}
+set.seed(1)
+k = 100; n = 30; z = qnorm(0.975,0,1)   # 1.96
+wald_in_CI = wilson_in_CI = vs_in_CI = NULL
+
+for (i in 1:k) {
+    x = rbinom(1, size=n, prob=0.1)
+    p = x/n
+    
+    # Wald's CI
+    wald_l = p - z*sqrt(p*(1-p)/n)
+    wald_r = p + z*sqrt(p*(1-p)/n)
+    wald_in_CI[i] = (wald_l<=0.1 & 0.1<=wald_r)
+    
+    # Wilson's CI
+    wilson_l = (z^2 + 2*n*p - z*sqrt(z^2+4*n*p*(1-p)))/(2*(n+z^2))
+    wilson_r = (z^2 + 2*n*p + z*sqrt(z^2+4*n*p*(1-p)))/(2*(n+z^2))
+    wilson_in_CI[i] = (wilson_l<=0.1 & 0.1<=wilson_r)
+        
+    # variance stabilized CI
+    vs_l = sin(asin(sqrt(x/n)) - z/(2*sqrt(n)))^2
+    vs_r = sin(asin(sqrt(x/n)) + z/(2*sqrt(n)))^2
+    vs_in_CI[i] = (vs_l<=0.1 & 0.1<=vs_r)
+}
+
+# proportion of k CIs actually contain true p=0.1 for Wald's CI
+mean(wald_in_CI)
+
+# proportion of k CIs actually contain true p=0.1 for Wilson's CI
+mean(wilson_in_CI)
+
+# proportion of k CIs actually contain true p=0.1 for variance stabilized CI
+mean(vs_in_CI)
+```
+
+(iii)
+Comparison & Comments:
+
+When n=30 (relatively small), the Wilson's CI and the variance stabilized CI are similarly good in estimating confidence intervals for p, but they are both much better than the Walz's CI. 
+
+Note: though in my simulation here Wilson's CI is slightly better than the variance stabilized CI, when setting the seed to other numbers, the variance stabilized CI can be slighly better than the Wilson's CI. So we can say that they are actually similarly good.
+
+
+#### (b)
+(i) 
+Though the number of sample size changed, since \(\alpha\) is still 0.05, so we are still constructing 95% confidence intervals for p. Therefore, the theoretically expected proportion of k confidence intervals that contains the true parameter \(p = 0.1\) should also be 95%.
+
+(ii)
+\(X \sim Binomial(n,p)\), and \(\hat{p}_{MLE} = X/n\)
+```{r}
+set.seed(1)
+k = 100; n = 150; z = qnorm(0.975,0,1)   # 1.96
+wald_in_CI = wilson_in_CI = vs_in_CI = NULL
+
+for (i in 1:k) {
+    x = rbinom(1, size=n, prob=0.1)
+    p = x/n
+    
+    # Wald's CI
+    wald_l = p - z*sqrt(p*(1-p)/n)
+    wald_r = p + z*sqrt(p*(1-p)/n)
+    wald_in_CI[i] = (wald_l<=0.1 & 0.1<=wald_r)
+    
+    # Wilson's CI
+    wilson_l = (z^2 + 2*n*p - z*sqrt(z^2+4*n*p*(1-p)))/(2*(n+z^2))
+    wilson_r = (z^2 + 2*n*p + z*sqrt(z^2+4*n*p*(1-p)))/(2*(n+z^2))
+    wilson_in_CI[i] = (wilson_l<=0.1 & 0.1<=wilson_r)
+        
+    # variance stabilized CI
+    vs_l = sin(asin(sqrt(x/n)) - z/(2*sqrt(n)))^2
+    vs_r = sin(asin(sqrt(x/n)) + z/(2*sqrt(n)))^2
+    vs_in_CI[i] = (vs_l<=0.1 & 0.1<=vs_r)
+}
+
+# proportion of k CIs actually contain true p=0.1 for Wald's CI
+mean(wald_in_CI)
+
+# proportion of k CIs actually contain true p=0.1 for Wilson's CI
+mean(wilson_in_CI)
+
+# proportion of k CIs actually contain true p=0.1 for variance stabilized CI
+mean(vs_in_CI)
+```
+
+(iii)
+Comparison & Comments:
+
+When n=150 (relatively large), the three CIs become all similarly good in estimating confidence intervals for p. Walz's CI is based on CLT, so it is unreliable when the sample size is small or the success probability is close to 0 or 1 (here true p=0.1). But now for large n, CLT works better in approximating the original distribution. On the contrary, Wilson' CI is an improvement over the normal approximation interval in that the actual coverage probability is closer to the nominal value.
+
+Note: though in my simulation here the three CIs are slightly working differently, when setting the seed to other numbers, their relative order of performance in goodness changes. So we can say that they are actually similarly good.
